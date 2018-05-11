@@ -70,7 +70,7 @@ def main(features, interactions,max_evaluations):
             Parent_B = select(initial_solutions)
 
             # 15: Children Ca, Cb ← Crossover(Copy(Pa), Copy(Pb))
-            Ca,Cb = crossover(Parent_A,Parent_B)
+            Ca,Cb = crossover(deepcopy(Parent_A),deepcopy(Parent_B))
 
             # 16: Q ← P ∪ {Mutate(Ca), Mutate(Cb)}
             tweak_Ca = tweak(Ca)
@@ -102,10 +102,10 @@ def initialize_population(length,num_solution):
     pass
 
 
-def copy(solution):
-    x = random.randrange(num_solution)
-    return solution[x]
-    pass
+# def copy(solution):
+#     x = random.randrange(num_solution)
+#     return solution[x]
+#     pass
 
 
 def tweak(solution):
@@ -210,4 +210,4 @@ def readTXT(path):
 #     interactions = readTXT(sys.argv[2])
 #     main(features, interactions)
 
-main("bdbc_feature.txt", "bdbc_interactions.txt",1000)
+main("bdbc_feature.txt", "bdbc_interactions.txt",100)
