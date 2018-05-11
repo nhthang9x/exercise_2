@@ -58,6 +58,10 @@ def main(features, interactions,max_evaluations):
                 # 10: Best ← Pi
                 best_solution = solution_value
                 best_value = value
+
+        # Print
+        print("Best value of configuration in ", num_evaluations, " iteration: ", best_solution)
+
         # 11: Q ← {}
         Q = []
 
@@ -107,9 +111,8 @@ def initialize_population(length,num_solution):
 #     return solution[x]
 #     pass
 
-
+# Algorithm 22 Bit-Flip Mutation
 def tweak(solution):
-    # Algorithm 22 Bit-Flip Mutation
     # 1: p ← probability of flipping a bit
     p = 1/feature_length
 
@@ -153,9 +156,8 @@ def select(solution):
     return P[index]
     pass
 
-
+# Algorithm 25 Uniform Crossover
 def crossover(solution_a, solution_b):
-    # Uniform Crossover
     # 1: p ← probability of swapping an index
     p = 1/feature_length
     a = solution_a
@@ -210,4 +212,4 @@ def readTXT(path):
 #     interactions = readTXT(sys.argv[2])
 #     main(features, interactions)
 
-main("bdbc_feature.txt", "bdbc_interactions.txt",100)
+main("bdbc_feature.txt", "bdbc_interactions.txt",1000)
