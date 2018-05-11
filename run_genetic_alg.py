@@ -30,7 +30,7 @@ def main(features, interactions,max_evaluations):
     interactions_data = readTXT(interactions)
 
     # 1: popsize ← desired population size
-    num_solution = 16
+    num_solution = 8
 
     # 5: Best ← ✷
     best_solution = None
