@@ -1,5 +1,4 @@
-#!python3
-import sys
+
 import numpy as np
 import random
 from copy import deepcopy
@@ -15,25 +14,21 @@ def seperate_array(initial_array):
     return index_array,value_array
 
 
-def main(features, interactions,max_evaluations):
+def main(features, interactions,max_evaluations = 1000,num_solution = 8):
 
     global feature_data
     global interactions_data
-    global num_solution
-    global best_solution
-    global best_value
-    global num_evaluations
     global feature_length
 
     # Read data from .txt file
     feature_data = readTXT(features)
     interactions_data = readTXT(interactions)
 
-    # 1: popsize ← desired population size
-    num_solution = 8
-
-    # 5: Best ← ✷
+    #Best ← {}
     best_solution = None
+
+    # History of Best
+    best_history = []
 
     # Length of feature
     feature_length = len(feature_data)
@@ -42,51 +37,53 @@ def main(features, interactions,max_evaluations):
     initial_solutions = initialize_population(feature_length,num_solution)
 
     num_evaluations = 0
-    # 6: repeat
+    # Repeat
     while num_evaluations < max_evaluations:
         num_evaluations += 1
 
-        # 7: for each individual Pi ∈ P do
+        # For each individual "value" ∈ initial_solutions do
         for value in initial_solutions:
 
-            # 8: AssessFitness(Pi)
+            # AssessFitness(value)
             solution_value = assess_fitness(value)
 
-            # 9: if Best = ✷ or Fitness(Pi) > Fitness(Best) then
+            # if Best = {} or Fitness(value) > Fitness(Best) then
             if (best_solution == None) or solution_value > best_solution:
 
-                # 10: Best ← Pi
+                #  Best ← value
                 best_solution = solution_value
                 best_value = value
+                best_history.append(solution_value)
 
         # Print
         print("Best value of configuration in ", num_evaluations, " iteration: ", best_solution)
 
-        # 11: Q ← {}
+        #  Q ← {}
         Q = []
 
-        # 12: for popsize/2 times do
+        # for popsize/2 times do
         for i in range(int(num_solution/2)):
 
-            # 13: Parent Pa ← SelectWithReplacement(P)
+            # Parent Pa ← SelectWithReplacement(P)
             Parent_A = select(initial_solutions)
-            # 14: Parent Pb ← SelectWithReplacement(P)
+            # Parent Pb ← SelectWithReplacement(P)
             Parent_B = select(initial_solutions)
 
-            # 15: Children Ca, Cb ← Crossover(Copy(Pa), Copy(Pb))
-            Ca,Cb = crossover(deepcopy(Parent_A),deepcopy(Parent_B))
+            # Children Ca, Cb ← Crossover(Copy(Pa), Copy(Pb))
+            Ca,Cb = crossover(copy(Parent_A),copy(Parent_B))
 
-            # 16: Q ← P ∪ {Mutate(Ca), Mutate(Cb)}
+            # Q ← P ∪ {Mutate(Ca), Mutate(Cb)}
             tweak_Ca = tweak(Ca)
             tweak_Cb = tweak(Cb)
             Q.append(tweak_Ca)
             Q.append(tweak_Cb)
 
-        # 17: P ← Q
-        initial_solutions = deepcopy(Q)
+        # P ← Q
+        initial_solutions = copy(Q)
 
     print("Best configuration: ",best_value)
     print("Best value: ",best_solution)
+    print("History of Best value: ",best_history)
     pass
 
 def optimize(population):
@@ -95,50 +92,48 @@ def optimize(population):
 
 
 def initialize_population(length,num_solution):
-    # 2: P ← {}
+    # P ← {}
     P_array = []
-    # 3: for popsize times do
+    # for popsize times do
     for i in range(num_solution):
         x = np.random.randint(2,size = length)
-        # 4: P ← P ∪ {new random individual}
+        # P ← P ∪ {new random individual}
         P_array.append(x)
     return P_array
     pass
 
 
-# def copy(solution):
-#     x = random.randrange(num_solution)
-#     return solution[x]
-#     pass
+def copy(solution):
+    return deepcopy(solution)
+    pass
 
-# Algorithm 22 Bit-Flip Mutation
+# Bit-Flip Mutation
 def tweak(solution):
-    # 1: p ← probability of flipping a bit
+    # p ← probability of flipping a bit
     p = 1/feature_length
 
-    # 2: !v ← boolean vector $v1, v2, ...vl% to be mutated
+    # !v ← boolean vector $v1, v2, ...vl% to be mutated
     v = solution
 
-    # 3: for i from 1 to l do
+    # for i from 1 to l do
     for i in range(feature_length):
-        # 4: if p ≥ random number chosen uniformly from 0.0 to 1.0 inclusive then
+        # if p ≥ random number chosen uniformly from 0.0 to 1.0 inclusive then
         if p >= np.random.rand():
-            # 5: vi ← ¬(vi)
+            # vi ← ¬(vi)
             if(v[i] == 0):
                 v[i] = 1
             else:
                 v[i] = 0
-    # 6: return !v
     return v
     pass
 
 
-# Algorithm 30 Fitness-Proportionate Selection
+# Fitness-Proportionate Selection
 def select(solution):
-    # 2: global !p ← population copied into a vector of individuals $p1, p2, ..., pl%
-    P =  deepcopy(solution)
+    # global !p ← population copied into a vector of individuals $p1, p2, ..., pl%
+    P =  copy(solution)
 
-    # 3: global !f ← $f1, f2, ..., fl% fitnesses of individuals in !p in the same order as !p
+    # global !f ← $f1, f2, ..., fl% fitnesses of individuals in !p in the same order as !p
     F = list()
     for value in P:
         F.append(assess_fitness(value))
@@ -156,17 +151,15 @@ def select(solution):
     return P[index]
     pass
 
-# Algorithm 25 Uniform Crossover
+# Uniform Crossover
 def crossover(solution_a, solution_b):
-    # 1: p ← probability of swapping an index
+    # p ← probability of swapping an index
     p = 1/feature_length
     a = solution_a
     b = solution_b
     for i in range(feature_length):
         if p >= np.random.rand():
-            temp = deepcopy(a[i])
-            a[i] = deepcopy(b[i])
-            b[i] = deepcopy(temp)
+            a[i],b[i] = b[i],a[i]
     return a,b
     pass
 
@@ -212,4 +205,4 @@ def readTXT(path):
 #     interactions = readTXT(sys.argv[2])
 #     main(features, interactions)
 
-main("bdbc_feature.txt", "bdbc_interactions.txt",1000)
+main("h264_feature.txt", "h264_interactions.txt")
