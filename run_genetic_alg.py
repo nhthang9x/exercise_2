@@ -14,7 +14,7 @@ def seperate_array(initial_array):
     return index_array,value_array
 
 
-def main(features, interactions,max_evaluations = 1000,num_solution = 8):
+def main(features, interactions,max_evaluations = 1000,num_solution = 16):
 
     global feature_data
     global interactions_data
@@ -136,7 +136,7 @@ def select(solution):
     # global !f ← $f1, f2, ..., fl% fitnesses of individuals in !p in the same order as !p
     F = list()
     for value in P:
-        F.append(assess_fitness(value))
+        F.append(abs(assess_fitness(value)))
 
     F = np.cumsum(F, dtype=float)
     random_value = random.uniform(0,F[-1])
@@ -205,4 +205,4 @@ def readTXT(path):
 #     interactions = readTXT(sys.argv[2])
 #     main(features, interactions)
 
-main("h264_feature.txt", "h264_interactions.txt")
+main("bdbc_feature.txt", "bdbc_interactions.txt")
